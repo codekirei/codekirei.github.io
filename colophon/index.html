@@ -1,0 +1,40 @@
+<!DOCTYPE html><html lang="en-us"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Colophon</title><link rel="canonical" href="http://codekirei.com/colophon"><link rel="author" href="http://codekirei.com/about"><link rel="stylesheet" href="/code/style.css"><meta name="description" content="This is the colophon"><meta name="msapplication-TileColor" content="#FFFFFF"><meta name="msapplication-TileImage" content="/favicon-144.png"><link rel="apple-touch-icon-precomposed" sizes="180x180" href="/favicon-180.png"><link rel="apple-touch-icon-precomposed" sizes="152x152" href="/favicon-152.png"><link rel="apple-touch-icon-precomposed" sizes="120x120" href="/favicon-120.png"><link rel="apple-touch-icon-precomposed" sizes="76x76" href="/favicon-76.png"></head><body class="body colophon has-topbar"><a class="menu-toggle" role="button" href="#footer-nav" aria-label="Open navigation menu"><div class="menu-toggle__icon"></div></a><nav class="menu" role="navigation"><ul class="menu__list"><li class="menu__item"><a class="menu__link" href="/">Blog</a></li><li class="menu__item"><a class="menu__link" href="/projects">Projects</a></li><li class="menu__item"><a class="menu__link" href="/about">About</a></li></ul></nav><div class="content-wrapper"><header class="topbar" role="heading"><div class="topbar__content"><h1 class="topbar__title">Colophon</h1></div></header><main id="scroll-to" role="main"><article class="content" role="article"><h1>Statically Generated Site</h1>
+<p>This site is entirely static. The original code used to generate it is open-sourced under the MIT license and available on <a href="https://github.com/codekirei/codekirei.github.io/tree/generator">GitHub</a>. A significant amount of nonoriginal open-source code was also used, much of which is listed below.</p>
+<h1>Markup</h1>
+<p>The site's content is written in <a href="http://daringfireball.net/projects/markdown/">Markdown</a> and rendered with <a href="https://github.com/markdown-it/markdown-it">markdown-it</a>. The templates for the site's HTML are <a href="http://mithril.js.org/">Mithril</a> modules rendered on the server with <a href="https://github.com/StephanHoyer/mithril-node-render">mithril-node-render</a>. Content is read and injected into the templates by a static markup generator I wrote titled <a href="https://github.com/codekirei/smg">smg</a>.</p>
+<h1>Style</h1>
+<p>The styles for this site are written in <a href="http://stylus-lang.com/">Stylus</a>. Concepts from <a href="http://itcss.io/">itcss</a> and <a href="http://getbem.com/">BEM</a> are used throughout. <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Flexible_Box_Layout/Using_CSS_flexible_boxes">Flexbox</a> is used extensively in lieu of a traditional grid system. The layout is responsive and has been tested on modern desktop and mobile browsers.</p>
+<ul>
+<li>Colors and Shades<ul>
+  <li><span style="color:#B00000">#B00000</span></li>
+  <li><span style="color:#000">#000<span></li>
+  <li><span style="color:#222">#222<span></li>
+  <li><span style="color:#555">#555<span></li>
+  <li><span style="color:#AAA">#AAA<span></li>
+  <li><span style="color:#EEE;background:#555;">#EEE<span></li>
+  <li><span style="color:#FFF;background:#222;">#FFF</span></li>
+</ul>
+</li>
+<li>Fonts
+<ul>
+<li><a href="http://www.opensans.com/">Open Sans</a></li>
+<li><a href="https://github.com/adobe-fonts/source-code-pro">Source Code Pro</a></li>
+</ul>
+</li>
+<li>SVG Icons
+<ul>
+<li><a href="http://fontawesome.io/">Font Awesome</a> via <a href="https://icomoon.io/app/">IcoMoon</a></li>
+</ul>
+</li>
+</ul>
+<h1>Scripts</h1>
+<p>The site's JavaScript is written in ES6, transpiled by <a href="https://babeljs.io/">Babel</a>, and bundled by <a href="http://webpack.github.io/">webpack</a>. <a href="https://github.com/ded/domready">Domready</a> is used extensively to ensure the DOM is, in fact, ready before DOM-dependent scripts fire. I also use my <a href="https://github.com/codekirei/get-element">get-element</a> module a lot to grab elements to interact with.</p>
+<p>The menu animation is powered by a custom script that uses <a href="https://github.com/gre/bezier-easing">bezier-easing</a> for easing calculations. The animation logic itself is entirely decoupled, so I'll likely break that out into a module soon.</p>
+<p>The scrolling animation that fires when the arrow at the bottom of a full-page banner is clicked is powered by <a href="https://github.com/cferdinandi/smooth-scroll">smooth-scroll</a>.</p>
+<p>Scripts are also used to
+prevent dragging elements,
+calculate how long ago posts were posted,
+and lock the height of full page banners on mobile to prevent janky resizing if browser chrome autohides.</p>
+<p>Do note, though, that the site is completely usable with all scripts disabled, if that's your cup of tea. Progressive enhancement FTW!</p>
+<h1>Gulp</h1>
+<p>The site is built by a custom modular <a href="https://github.com/gulpjs/gulp">Gulp</a> task tree that provides a unified CLI interface to the various processess necessary to get from raw source to browser-ready code. This includes a most convenient watch task that watches all source for changes, automatically runs any necessary tasks in response to said changes, and automatically pushes those changes to the browser (which automatically reloads) through <a href="https://www.browsersync.io/">browser-sync</a>.</p></article></main><footer class="site-footer"><div class="site-footer__content"><nav class="footer-nav" id="footer-nav" role="navigation"><ul class="footer-nav__list"><li class="footer-nav__item"><a class="footer-nav__link" href="/">Blog</a></li><li class="footer-nav__item"><a class="footer-nav__link" href="/projects">Projects</a></li><li class="footer-nav__item"><a class="footer-nav__link" href="/about">About</a></li></ul></nav><hr class="site-footer__divider"><a class="site-footer__info" href="/colophon" role="button" ariaLabel="About the site"><svg class="site-footer__info-svg" viewBox="0 0 877.7142857142858 1024"><path d="M585.143 786.286v-91.429q0-8-5.143-13.143t-13.143-5.143h-54.857v-292.571q0-8-5.143-13.143t-13.143-5.143h-182.857q-8 0-13.143 5.143t-5.143 13.143v91.429q0 8 5.143 13.143t13.143 5.143h54.857v182.857h-54.857q-8 0-13.143 5.143t-5.143 13.143v91.429q0 8 5.143 13.143t13.143 5.143h256q8 0 13.143-5.143t5.143-13.143zM512 274.286v-91.429q0-8-5.143-13.143t-13.143-5.143h-109.714q-8 0-13.143 5.143t-5.143 13.143v91.429q0 8 5.143 13.143t13.143 5.143h109.714q8 0 13.143-5.143t5.143-13.143zM877.714 512q0 119.429-58.857 220.286t-159.714 159.714-220.286 58.857-220.286-58.857-159.714-159.714-58.857-220.286 58.857-220.286 159.714-159.714 220.286-58.857 220.286 58.857 159.714 159.714 58.857 220.286z"></path></svg></a></div></footer></div><script src="/code/bundle.js" async></script></body></html>

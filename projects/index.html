@@ -1,0 +1,57 @@
+<!DOCTYPE html><html lang="en-us"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>My Projects</title><link rel="canonical" href="http://codekirei.com/projects"><link rel="author" href="http://codekirei.com/about"><link rel="stylesheet" href="/code/style.css"><meta name="description" content="Some things I've made"><meta name="msapplication-TileColor" content="#FFFFFF"><meta name="msapplication-TileImage" content="/favicon-144.png"><link rel="apple-touch-icon-precomposed" sizes="180x180" href="/favicon-180.png"><link rel="apple-touch-icon-precomposed" sizes="152x152" href="/favicon-152.png"><link rel="apple-touch-icon-precomposed" sizes="120x120" href="/favicon-120.png"><link rel="apple-touch-icon-precomposed" sizes="76x76" href="/favicon-76.png"></head><body class="body projects has-topbar"><a class="menu-toggle" role="button" href="#footer-nav" aria-label="Open navigation menu"><div class="menu-toggle__icon"></div></a><nav class="menu" role="navigation"><ul class="menu__list"><li class="menu__item"><a class="menu__link" href="/">Blog</a></li><li class="menu__item"><a class="menu__link" href="/projects">Projects</a></li><li class="menu__item"><a class="menu__link" href="/about">About</a></li></ul></nav><div class="content-wrapper"><header class="topbar" role="heading"><div class="topbar__content"><h1 class="topbar__title">My Projects</h1></div></header><main id="scroll-to" role="main"><article class="content" role="article"><h2>Stable</h2>
+<p>These projects have complete documentation and test coverage and are not likely to see drastic changes or code churn in the near future.</p>
+<ul>
+<li><code>auto-import</code> <a href="https://github.com/codekirei/auto-import">source</a></li>
+</ul>
+<p>A Node.js module that automatically builds an index file filled with <code>import</code> statements to every module in a directory. This enables workflow nirvana with my typical gulp and webpack configs for frontend dev work — I simply add or remove modules in my scripts dir, and everything just works.</p>
+<ul>
+<li><code>get-element</code> <a href="https://github.com/codekirei/get-element">source</a></li>
+</ul>
+<p>A browser-focused JS module for quickly selecting elements by tag or class. Basically syntactic sugar for approximately this:</p>
+<pre><code class="hljs language-js"><span class="hljs-built_in">Array</span>.prototype.slice.call(<span class="hljs-built_in">document</span>.getElementsByClassName(<span class="hljs-string">'exampleClass'</span>))
+</code></pre>
+<p>It's fast, it's tiny, and it gives you an array to work with instead of an HTMLCollection. Meant to be bundled up with something like Webpack or Browserify, but I've included a self-executing browser build too, just in case.</p>
+<ul>
+<li><code>gulp-regex-rename</code> <a href="https://github.com/codekirei/gulp-regex-rename">source</a></li>
+</ul>
+<p>A gulp plugin that renames files by matching a regex, because everyone loves regexes! Functions just fine when the replacement string is empty, so you can remove a substring as well (e.g., <code>index.es6.js</code> -&gt; <code>index.js</code>).</p>
+<ul>
+<li><code>hanging-indent</code> <a href="https://github.com/codekirei/hanging-indent">source</a></li>
+</ul>
+<p>A Node.js module for intelligently adding a hanging indent to a string. Configurable indent and line lengths.</p>
+<ul>
+<li><code>node-multispinner</code> <a href="https://github.com/codekirei/node-multispinner">source</a></li>
+</ul>
+<p>One of my favorites! A Node.js module for simultaneously instantiating and controlling multiple ASCII loading spinners in the console. Potentially very useful for CLI applications that queue multiple simultaneous tasks with varying completion times. Definitely give this one a pull and check out the examples!</p>
+<ul>
+<li><code>type-iterator</code> <a href="https://github.com/codekirei/type-iterator">source</a></li>
+</ul>
+<p>A Node.js module for running a callback against multiple JS types easily. Supports <code>undefined</code>, <code>null</code>, <code>String</code>, <code>Boolean</code>, <code>Number</code>, <code>Function</code>, <code>Array</code>, and <code>Object</code>. Potentially very useful for writing test functions.</p>
+<ul>
+<li><code>yaml-fm</code> <a href="https://github.com/codekirei/yaml-fm">source</a></li>
+</ul>
+<p>A Node.js module for YAML frontmatter parsing. Lightweight but powerful. I use it in my <a href="https://github.com/codekirei/smg">static markup generator</a>.</p>
+<h2>Work In Progress</h2>
+<p>These projects are in varying stages of completion, but I'm excited enough about them that they'll likely move up into the stable category fairly soon.</p>
+<ul>
+<li><code>hari</code> <a href="https://github.com/codekirei/hari">source</a></li>
+</ul>
+<p>Another one of my favorites! A Node.js module for watching files and automatically running a script in response. Clears term in between runs. Also pretty prints some fun metadata before the script results, like how long the script has been running and how many times it has been re-run this session. Intended for use in development to re-run something you want updated output from regularly, like a test suite. It's more configurable than the standalone <code>-w</code> or <code>--watch</code> built into a lot of scripts these days.</p>
+<ul>
+<li><code>parse-terminfo</code> <a href="https://github.com/codekirei/parse-terminfo">source</a></li>
+</ul>
+<p>Very early concept of a standalone terminfo parser in Node.js. Right now it just reads <code>infocmp</code>, but eventually this will manually process the actual terminfo file. Inspired by the parser in <a href="https://twitter.com/_chjj">chjj</a>'s monolithic <a href="https://github.com/chjj/blessed">blessed</a> library.</p>
+<ul>
+<li><code>smg</code> <a href="https://github.com/codekirei/smg">source</a></li>
+</ul>
+<p>A Node.js static-markup-generator. The idea behind this module is that I love static-site-generators, but my modern CSS and JS tooling and workflows don't. This module only cares about markup — markdown content with YAML frontmatter, and a templating solution. That means it plays nice with Gulp / Grunt / Fly / Browserify / Webpack / Babel / Stylus / Sass / Whatever, because those things aren't markup. Still hashing out some of the details with templating, but I did use this module to build this site, so it's coming along!</p>
+<h2>Ongoing</h2>
+<p>These are &quot;living&quot; projects that I expect to continually evolve over time.</p>
+<ul>
+<li><code>dotfiles</code> <a href="https://github.com/codekirei/dotfiles">source</a></li>
+</ul>
+<p>My dotfiles repo! It's currently Ansible powered and thus idempotent. Targets a unix-based dev box with <code>XDG_CONFIG</code> support. Creates lots of symlinks. Needs some serious love. I'll get around to it... eventually!</p>
+<ul>
+<li><code>codekirei.com</code> <a href="https://github.com/codekirei/codekirei.github.io">source</a></li>
+</ul>
+<p>The custom static-site-generator powering this site. Uses a lot of open-source tech like <a href="http://gulpjs.com/">Gulp</a>, <a href="http://stylus-lang.com/">Stylus</a>, <a href="https://babeljs.io/">Babel</a>, <a href="http://mithril.js.org/">Mithril</a>, <a href="http://webpack.github.io/">webpack</a>, and my very own <a href="https://github.com/codekirei/smg">smg</a>. Check out the <a href="/colophon">colophon</a> for a more detailed breakdown.</p></article></main><footer class="site-footer"><div class="site-footer__content"><nav class="footer-nav" id="footer-nav" role="navigation"><ul class="footer-nav__list"><li class="footer-nav__item"><a class="footer-nav__link" href="/">Blog</a></li><li class="footer-nav__item"><a class="footer-nav__link" href="/projects">Projects</a></li><li class="footer-nav__item"><a class="footer-nav__link" href="/about">About</a></li></ul></nav><hr class="site-footer__divider"><a class="site-footer__info" href="/colophon" role="button" ariaLabel="About the site"><svg class="site-footer__info-svg" viewBox="0 0 877.7142857142858 1024"><path d="M585.143 786.286v-91.429q0-8-5.143-13.143t-13.143-5.143h-54.857v-292.571q0-8-5.143-13.143t-13.143-5.143h-182.857q-8 0-13.143 5.143t-5.143 13.143v91.429q0 8 5.143 13.143t13.143 5.143h54.857v182.857h-54.857q-8 0-13.143 5.143t-5.143 13.143v91.429q0 8 5.143 13.143t13.143 5.143h256q8 0 13.143-5.143t5.143-13.143zM512 274.286v-91.429q0-8-5.143-13.143t-13.143-5.143h-109.714q-8 0-13.143 5.143t-5.143 13.143v91.429q0 8 5.143 13.143t13.143 5.143h109.714q8 0 13.143-5.143t5.143-13.143zM877.714 512q0 119.429-58.857 220.286t-159.714 159.714-220.286 58.857-220.286-58.857-159.714-159.714-58.857-220.286 58.857-220.286 159.714-159.714 220.286-58.857 220.286 58.857 159.714 159.714 58.857 220.286z"></path></svg></a></div></footer></div><script src="/code/bundle.js" async></script></body></html>
