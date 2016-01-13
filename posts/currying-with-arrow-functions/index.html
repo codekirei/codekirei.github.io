@@ -1,0 +1,217 @@
+<!DOCTYPE html><html lang="en-us"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Currying and ES6 Arrow Functions</title><link rel="canonical" href="http://codekirei.com/posts/currying-with-arrow-functions"><link rel="author" href="http://codekirei.com/about"><link rel="stylesheet" href="/code/style.css"><meta name="description" content="Combine ES6's arrow functions with currying for concise, composable, testable JavaScript."><meta name="msapplication-TileColor" content="#FFFFFF"><meta name="msapplication-TileImage" content="/favicon-144.png"><link rel="apple-touch-icon-precomposed" sizes="180x180" href="/favicon-180.png"><link rel="apple-touch-icon-precomposed" sizes="152x152" href="/favicon-152.png"><link rel="apple-touch-icon-precomposed" sizes="120x120" href="/favicon-120.png"><link rel="apple-touch-icon-precomposed" sizes="76x76" href="/favicon-76.png"></head><body class="body currying-with-arrow-functions has-banner"><a class="menu-toggle" role="button" href="#footer-nav" aria-label="Open navigation menu"><div class="menu-toggle__icon"></div></a><nav class="menu" role="navigation"><ul class="menu__list"><li class="menu__item"><a class="menu__link" href="/">Blog</a></li><li class="menu__item"><a class="menu__link" href="/projects">Projects</a></li><li class="menu__item"><a class="menu__link" href="/about">About</a></li></ul></nav><header class="banner" role="banner"><div class="banner__content"><h1 class="banner__title">Currying and ES6 Arrow Functions</h1><div class="banner__meta"><time class="banner__date replace-time" datetime="2016-01-11T12:00-08:00">1/11/2016</time><span class="banner__dash"> &mdash; </span><span class="banner__ert">10 minute read</span></div><ul class="banner__tags"><li class="banner__tag">functional programming</li><li class="banner__tag">ES6</li></ul></div><div class="scroll-down"><a class="scroll-down__link" href="#scroll-to" role="button" data-scroll><svg class="scroll-down__svg" viewBox="0 0 658 1024"><path d="M614.286 420.571q0 7.429-5.714 13.143l-266.286 266.286q-5.714 5.714-13.143 5.714t-13.143-5.714l-266.286-266.286q-5.714-5.714-5.714-13.143t5.714-13.143l28.571-28.571q5.714-5.714 13.143-5.714t13.143 5.714l224.571 224.571 224.571-224.571q5.714-5.714 13.143-5.714t13.143 5.714l28.571 28.571q5.714 5.714 5.714 13.143z"></path></svg></a></div></header><main id="scroll-to" role="main"><article class="content" role="article"><p><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions">Arrow functions</a> are a concise way to create functions in ES6 JavaScript. <a href="https://en.wikipedia.org/wiki/Currying">Currying</a> is a technique often used in functional programming languages like <a href="https://wiki.haskell.org/Currying">Haskell</a>. Put them together, and you get beautiful, concise function declarations that are both easy to read and easy to test.</p>
+<h2>Functions in JavaScript</h2>
+<p>First, let's talk about functions in JavaScript. There are two ways to define JS functions: <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Functions#Function_declarations">declarations</a> and <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Functions#Function_expressions">expressions</a>.</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// declaration</span>
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">addOne</span>(<span class="hljs-params">foo</span>) </span>{
+  <span class="hljs-keyword">return</span> foo + <span class="hljs-number">1</span>
+}
+
+<span class="hljs-comment">// expression</span>
+<span class="hljs-keyword">var</span> addOne = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">foo</span>) </span>{
+  <span class="hljs-keyword">return</span> foo + <span class="hljs-number">1</span>
+}
+</code></pre>
+<p>Function declarations are named functions invoked with the <code>function</code> keyword, while function expressions are anonymous functions that are assigned to a <code>var</code>. One of the key differences between function declarations and function expressions is <a href="https://developer.mozilla.org/en-US/docs/Glossary/Hoisting">hoisting</a>. In JavaScript, <code>var</code> and <code>function</code> statements are hoisted to the top of their scope, which means they can be interacted with before being declared. However, there are some intricacies to be aware of.</p>
+<pre><code class="hljs language-js">foo = <span class="hljs-number">1</span>
+<span class="hljs-keyword">var</span> foo
+</code></pre>
+<p>In this case, <code>foo</code> has the value <code>1</code> assigned to it before it is declared. This works because of hoisting — what's really happening is the variable declaration <code>var foo</code> is being raised to the top of its scope (and thus before <code>foo = 1</code>), and <code>foo</code> is given the value <code>undefined</code> until further notice. A few well-placed <code>console.log</code> statements illustrate this nicely.</p>
+<pre><code class="hljs language-js"><span class="hljs-built_in">console</span>.log(foo)
+  <span class="hljs-comment">// prints undefined</span>
+
+foo = <span class="hljs-number">1</span>
+
+<span class="hljs-built_in">console</span>.log(foo)
+  <span class="hljs-comment">// prints 1</span>
+
+<span class="hljs-keyword">var</span> foo
+</code></pre>
+<p>The fact that hoisted variables are given a value of <code>undefined</code> can be detrimental in the context of function expressions — ordering becomes very important.</p>
+<pre><code class="hljs language-js">addOne(<span class="hljs-number">1</span>)
+  <span class="hljs-comment">// throws TypeError: addOne is not a function</span>
+
+<span class="hljs-keyword">var</span> addOne = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">foo</span>) </span>{
+  <span class="hljs-keyword">return</span> foo + <span class="hljs-number">1</span>
+}
+</code></pre>
+<p>At the point <code>addOne(1)</code> is called here, <code>addOne</code> still has the value <code>undefined</code>, not the function assigned later in the code, so JavaScript sees <code>undefined</code> where it expects a <code>function</code> and throws a TypeError. In order for this code to work as intended, the function expression has to come before <code>addOne(1)</code>. Function declarations avoid this issue, because function declarations are not <code>undefined</code> when hoisted.</p>
+<pre><code class="hljs language-js">addOne(<span class="hljs-number">1</span>)
+  <span class="hljs-comment">// returns 2</span>
+
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">addOne</span>(<span class="hljs-params">foo</span>) </span>{
+  <span class="hljs-keyword">return</span> foo + <span class="hljs-number">1</span>
+}
+</code></pre>
+<h2>Introducing Arrow Functions</h2>
+<p>Arrow functions are a shorthand syntax for creating function expressions. Note that I'll mostly use <code>const</code> — another new ES6 feature — in place of <code>var</code> from here out. A <code>const</code> is a <code>var</code> with a read-only reference, meaning it cannot be assigned to a different value once assigned. This isn't absolutely necessary, but in general using <code>const</code> with function expressions that you don't intend to reassign is a good practice in ES6.</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// function expression</span>
+<span class="hljs-keyword">var</span> addOne = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">foo</span>) </span>{
+  <span class="hljs-keyword">return</span> foo + <span class="hljs-number">1</span>
+}
+
+<span class="hljs-comment">// equivalent arrow function</span>
+<span class="hljs-keyword">const</span> addOne = foo =&gt; foo + <span class="hljs-number">1</span>
+</code></pre>
+<p>Arrow functions do a number of things automatically behind the scenes, like lexically binding <code>this</code> (which is very important, but not relevant to this blog post). Additionally, under certain conditions, arrow functions allow syntax to be omitted:</p>
+<ul>
+<li>If there is only one parameter, parens are optional</li>
+<li>If the function body is a single expression, braces are optional and the expression is automatically returned</li>
+</ul>
+<pre><code class="hljs language-js"><span class="hljs-comment">// arrow function with optional syntax added back in</span>
+<span class="hljs-keyword">const</span> foo = (bar) =&gt; {
+  <span class="hljs-keyword">return</span> bar + <span class="hljs-number">1</span>
+}
+</code></pre>
+<p>An arrow function with all the syntax added back in doesn't look all that different from a traditional function expression, so optimal arrow functions (from a readability standpoint) consist of a single expression that takes a single parameter. At first, this seems very limiting. Hopefully, I'll be able to change your mind on that, at least a little.</p>
+<h1>Dealing With Complexity</h1>
+<p>A function that simply increases a number by one is quite simple, so I think something a bit more complex is in order. First, let's say we want to increase each number in an array by one.</p>
+<pre><code class="hljs language-js"><span class="hljs-keyword">const</span> addOneToEach = ar =&gt; ar.map(num =&gt; num + <span class="hljs-number">1</span>)
+
+addOneToEach([<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>])
+  <span class="hljs-comment">// returns [2, 3, 4]</span>
+</code></pre>
+<p>What's happening here? We've declared an arrow function that takes array <code>ar</code> as its sole parameter. This function iterates over <code>ar</code> with <code>Array.prototype.map()</code>. <code>.map()</code> takes a callback function with the arguments <code>(currentValue, index, array)</code>. We only care about <code>currentValue</code>, so we use the anonymous arrow function <code>num =&gt; num + 1</code> as the callback. All together, <code>addOneToEach</code> returns an array constructed by the results of applying the anonymous arrow function to each value in <code>ar</code>.</p>
+<p>That's a good start! But wait, we've just discovered that sometimes the arrays of numbers that we need to increment by one come from an API that stringifies numbers, and there's nothing we can do about it (<em>grumble grumble</em>). It's not consistent, either — sometimes some of the numbers are stringified and some aren't. Guess we'll just have to add some logic to detect strings and un-stringify them.</p>
+<pre><code class="hljs language-js"><span class="hljs-keyword">const</span> addOneToEach = ar =&gt;
+  ar.map(entity =&gt; {
+    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> entity === <span class="hljs-string">'string'</span>) {
+      <span class="hljs-keyword">return</span> <span class="hljs-built_in">parseInt</span>(entity) + <span class="hljs-number">1</span>
+    }
+    <span class="hljs-keyword">return</span> entity + <span class="hljs-number">1</span>
+  })
+
+addOneToEach([<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>])
+  <span class="hljs-comment">// still returns [2, 3, 4]</span>
+
+addOneToEach([<span class="hljs-number">1</span>, <span class="hljs-string">'2'</span>, <span class="hljs-number">3</span>])
+  <span class="hljs-comment">// returns [2, 3, 4] as well, awesome!</span>
+</code></pre>
+<p>That works, but look how fast things got kind of ugly. Our old friends <code>{</code>, <code>}</code>, and <code>return</code> are back, and we're already nesting logic three levels deep.</p>
+<p>One trick for writing clean arrow functions when you have an <code>if...else</code> logic block is to use a <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Conditional_Operator">ternary expression</a> instead, so let's try that.</p>
+<pre><code class="hljs language-js"><span class="hljs-keyword">const</span> addOneToEach = ar =&gt;
+  ar.map(entity =&gt; <span class="hljs-keyword">typeof</span> entity === <span class="hljs-string">'string'</span>
+    ? <span class="hljs-built_in">parseInt</span>(entity) + <span class="hljs-number">1</span>
+    : entity + <span class="hljs-number">1</span>
+  )
+</code></pre>
+<p>Much better! We still have a lot of logic wrapped up in an anonymous callback, though. We can't reuse that logic anywhere, and we can't export it or test it in isolation. Let's split up the <code>+ 1</code> and <code>parseInt</code> into separate named functions and use those as separate callbacks inside chained <code>ar.map()</code> calls.</p>
+<pre><code class="hljs language-js"><span class="hljs-keyword">const</span> ensureNum = entity =&gt;
+  <span class="hljs-keyword">typeof</span> entity === <span class="hljs-string">'string'</span> ? <span class="hljs-built_in">parseInt</span>(entity) : entity
+
+<span class="hljs-keyword">const</span> addOne = num =&gt; num + <span class="hljs-number">1</span>
+
+<span class="hljs-keyword">const</span> addOneToEach = ar =&gt;
+  ar.map(ensureNum)
+    .map(addOne)
+</code></pre>
+<p>Sorcery! There's a lot to digest here. We've confined the mutative bits of logic in their own named arrow functions, <code>ensureNum</code> and <code>addOne</code>, which makes them easily reusable, exportable, and testable. We use these functions as callbacks in chained <code>.map()</code> calls in our <code>addOneToEach</code> function. We also take advantage of a little syntax trick with applying the callbacks — because the entire callback expression consists of a named function, we can skip creating an anonymous function that just passes parameters to the named function and use the named function itself. To illustrate:</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// anonymous function callback</span>
+<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">addOneToEach</span>(<span class="hljs-params">ar</span>) </span>{
+  <span class="hljs-keyword">return</span> ar.map(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">num</span>) </span>{
+    <span class="hljs-keyword">return</span> num + <span class="hljs-number">1</span>
+  })
+}
+
+<span class="hljs-comment">// anonymous callback with arrow functions</span>
+<span class="hljs-keyword">const</span> addOneToEach = ar =&gt; ar.map(num =&gt; num + <span class="hljs-number">1</span>)
+
+<span class="hljs-comment">// named function applied by anonymous callback arrow function</span>
+<span class="hljs-keyword">const</span> addOne = num =&gt; num + <span class="hljs-number">1</span>
+<span class="hljs-keyword">const</span> addOneToEach = ar =&gt; ar.map(num =&gt; addOne(num))
+
+<span class="hljs-comment">// named function callback</span>
+<span class="hljs-keyword">const</span> addOne = num =&gt; num + <span class="hljs-number">1</span>
+<span class="hljs-keyword">const</span> addOneToEach = ar =&gt; ar.map(addOne)
+</code></pre>
+<p>Awesome! We just got word, though, that management wants to introduce some new features that will require incrementing by two and three sometimes, not just one. How do we implement that? Well, we could brute force it...</p>
+<pre><code class="hljs language-js"><span class="hljs-keyword">const</span> ensureNum = entity =&gt;
+  <span class="hljs-keyword">typeof</span> entity === <span class="hljs-string">'string'</span> ? <span class="hljs-built_in">parseInt</span>(entity) : entity
+
+<span class="hljs-keyword">const</span> addOne = num =&gt; num + <span class="hljs-number">1</span>
+<span class="hljs-keyword">const</span> addTwo = num =&gt; num + <span class="hljs-number">2</span>
+<span class="hljs-keyword">const</span> addThree = num =&gt; num + <span class="hljs-number">3</span>
+
+<span class="hljs-keyword">const</span> addOneToEach = ar =&gt;
+  ar.map(ensureNum)
+    .map(addOne)
+
+<span class="hljs-keyword">const</span> addTwoToEach = ar =&gt;
+  ar.map(ensureNum)
+    .map(addTwo)
+
+<span class="hljs-keyword">const</span> addThreeToEach = ar =&gt;
+  ar.map(ensureNum)
+    .map(addThree)
+</code></pre>
+<p>Obviously, that approach doesn't scale. Let's <a href="https://en.wikipedia.org/wiki/Don't_repeat_yourself">DRY</a> things up by adding a new param, <code>by</code>, to hold the number we are incrementing by.</p>
+<pre><code class="hljs language-js"><span class="hljs-keyword">const</span> ensureNum = entity =&gt;
+  <span class="hljs-keyword">typeof</span> entity === <span class="hljs-string">'string'</span> ? <span class="hljs-built_in">parseInt</span>(entity) : entity
+
+<span class="hljs-keyword">const</span> incrementEach = (ar, by) =&gt;
+  ar.map(ensureNum)
+    .map(num =&gt; num + by)
+</code></pre>
+<p>That's much better, but we've lost our named <code>addOne</code> callback. Let's make a new <code>addNums</code> arrow function that we can pass both the current <code>num</code> in <code>.map()</code> and the new <code>by</code> param from <code>incrementEach</code> to.</p>
+<pre><code class="hljs language-js"><span class="hljs-keyword">const</span> ensureNum = entity =&gt;
+  <span class="hljs-keyword">typeof</span> entity === <span class="hljs-string">'string'</span> ? <span class="hljs-built_in">parseInt</span>(entity) : entity
+
+<span class="hljs-keyword">const</span> addNums = (a, b) =&gt; a + b
+
+<span class="hljs-keyword">const</span> incrementEach = (ar, by) =&gt;
+  ar.map(ensureNum)
+    .map(num =&gt; addNums(num, by))
+</code></pre>
+<p>That wasn't so hard, right? Now we have a flexible <code>incrementEach</code> function that can increment an <code>ar</code> of numbers or stringified numbers by any number <code>by</code>. So are we done? Not quite!</p>
+<h2>Adding the Curry</h2>
+<p><a href="https://en.wikipedia.org/wiki/Currying">Currying</a> is a mathematical concept that involves splitting up a function that takes multiple arguments (params) into a sequence of functions that each take an individual argument. It is most commonly used in Functional programming languages like <a href="https://www.haskell.org/">Haskell</a>, but JavaScript gets to join in on the fun too since it supports <a href="https://en.wikipedia.org/wiki/Higher-order_function">higher-order functions</a>.</p>
+<p>Let's start simple:</p>
+<pre><code class="hljs language-js"><span class="hljs-keyword">const</span> sum = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">a, b</span>) </span>{
+  <span class="hljs-keyword">return</span> a + b
+}
+
+sum(<span class="hljs-number">3</span>, <span class="hljs-number">4</span>)
+  <span class="hljs-comment">// returns 7</span>
+</code></pre>
+<p>Here we have a function expression that adds together two parameters. Let's curry this function by splitting it into smaller functions that take a single param at a time. This is possible because JavaScript functions can return other functions.</p>
+<pre><code class="hljs language-js"><span class="hljs-keyword">const</span> sum = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">a</span>) </span>{
+  <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">b</span>) </span>{
+    <span class="hljs-keyword">return</span> a + b
+  }
+}
+
+sum(<span class="hljs-number">3</span>)(<span class="hljs-number">4</span>)
+  <span class="hljs-comment">// returns 7</span>
+</code></pre>
+<p>That may seem stupid, but stick with me and it will all be worth it. Notice the difference in how the curried version of <code>sum</code> is called. In the normal function call, we pass two params: <code>sum(3, 4)</code>. In the curried function, we pass the first param — <code>sum(3)</code> — then pass the next param in a new set of params to the anonymous function returned by <code>sum(3)</code>. So by calling <code>sum(3)(4)</code>, we are making two distinct function calls with two distinct groups of parameters that each contain on parameter, as opposed to <code>sum(3, 4)</code> which calls one function with one group of two parameters.</p>
+<p>Now, let's mix in some arrow functions.</p>
+<pre><code class="hljs language-js"><span class="hljs-comment">// no curry</span>
+<span class="hljs-keyword">const</span> sum = (a, b) =&gt; a + b
+
+<span class="hljs-comment">// curry</span>
+<span class="hljs-keyword">const</span> sum = a =&gt; b =&gt; a + b
+</code></pre>
+<p>Woah! Double arrow function! What does this mean? When you break it down, this curried double arrow function is functionally equivalent to the curried function expression from before. You have a named arrow function returning an anonymous arrow function, and both functions accept a single parameter. Isn't it beautiful?</p>
+<p>Let's go back to our <code>incrementEach</code> function. Here is where we left things:</p>
+<pre><code class="hljs language-js"><span class="hljs-keyword">const</span> ensureNum = entity =&gt;
+  <span class="hljs-keyword">typeof</span> entity === <span class="hljs-string">'string'</span> ? <span class="hljs-built_in">parseInt</span>(entity) : entity
+
+<span class="hljs-keyword">const</span> addNums = (a, b) =&gt; a + b
+
+<span class="hljs-keyword">const</span> incrementEach = (ar, by) =&gt;
+  ar.map(ensureNum)
+    .map(num =&gt; addNums(num, by))
+</code></pre>
+<p>Let's rewrite <code>addNums</code> with our newfound currying skills.</p>
+<pre><code class="hljs language-js"><span class="hljs-keyword">const</span> ensureNum = entity =&gt;
+  <span class="hljs-keyword">typeof</span> entity === <span class="hljs-string">'string'</span> ? <span class="hljs-built_in">parseInt</span>(entity) : entity
+
+<span class="hljs-keyword">const</span> addNums = a =&gt; b =&gt; a + b
+
+<span class="hljs-keyword">const</span> incrementEach = (ar, by) =&gt;
+  ar.map(ensureNum)
+    .map(addNums(by))
+</code></pre>
+<p><code>addNums</code> is now a function that takes a parameter that returns a function that takes <em>another</em> parameter. So first we call <code>addNums(by)</code>, which returns the anonymous function <code>b =&gt; by + b</code>. <code>.map()</code> then calls this anonymous function as its callback and returns <code>by</code> + <code>currentValue</code> — the current value in the array incremented by the value of <code>by</code>.</p>
+<p>With currying and (double) arrow functions, we get to keep our named calledbacks that are exportable, reusable, and testable in isolation. We get the handy callback shorthand syntax so we don't have to write extra anonymous callback functions just to pass variables, yet our named callback functions are still flexible enough to receive params passed down from a higher-order function when they are called.</p>
+<p>Do you recall how earlier it seemed that writing functions that take a single parameter and return a single expression in order to optimize readability with arrow functions would be limiting? With currying, it doesn't have to be! I've been experimenting with this technique a lot in my own projects and I really like it so far. For some more examples, check out the code in my <a href="https://github.com/codekirei/hari/tree/master/lib">hari</a> and <a href="https://github.com/codekirei/smg/blob/master/index.js">smg</a> projects on GitHub.</p>
+<p>That's all for now! If you made it all the way here, give yourself a pat on the back. I hope you enjoyed the read and maybe even learned a thing or two. Now go forth and make cool things!</p><img class="fleuron" src="/img/kunai-fleuron.png" alt="fleuron"></article><section class="author"><img class="author__img" src="/img/author.png" alt="picture of author"><div class="author__info"><span class="author__title">Author</span><a class="author__name">Jacob Blakely</a><a class="author__hello-button" href="mailto:jacob@codekirei.com"><span class="author__hello-button__text">say hello</span><svg class="author__hello-button__svg" viewBox="0 0 1024 1024"><path d="M1024 405.714v453.714q0 37.714-26.857 64.571t-64.571 26.857h-841.143q-37.714 0-64.571-26.857t-26.857-64.571v-453.714q25.143 28 57.714 49.714 206.857 140.571 284 197.143 32.571 24 52.857 37.429t54 27.429 62.857 14h1.143q29.143 0 62.857-14t54-27.429 52.857-37.429q97.143-70.286 284.571-197.143 32.571-22.286 57.143-49.714zM1024 237.714q0 45.143-28 86.286t-69.714 70.286q-214.857 149.143-267.429 185.714-5.714 4-24.286 17.429t-30.857 21.714-29.714 18.571-32.857 15.429-28.571 5.143h-1.143q-13.143 0-28.571-5.143t-32.857-15.429-29.714-18.571-30.857-21.714-24.286-17.429q-52-36.571-149.714-104.286t-117.143-81.429q-35.429-24-66.857-66t-31.429-78q0-44.571 23.714-74.286t67.714-29.714h841.143q37.143 0 64.286 26.857t27.143 64.571z"></path></svg></a></div></section></main><footer class="site-footer"><div class="site-footer__content"><nav class="footer-nav" id="footer-nav" role="navigation"><ul class="footer-nav__list"><li class="footer-nav__item"><a class="footer-nav__link" href="/">Blog</a></li><li class="footer-nav__item"><a class="footer-nav__link" href="/projects">Projects</a></li><li class="footer-nav__item"><a class="footer-nav__link" href="/about">About</a></li></ul></nav><hr class="site-footer__divider"><a class="site-footer__info" href="/colophon" role="button" ariaLabel="About the site"><svg class="site-footer__info-svg" viewBox="0 0 877.7142857142858 1024"><path d="M585.143 786.286v-91.429q0-8-5.143-13.143t-13.143-5.143h-54.857v-292.571q0-8-5.143-13.143t-13.143-5.143h-182.857q-8 0-13.143 5.143t-5.143 13.143v91.429q0 8 5.143 13.143t13.143 5.143h54.857v182.857h-54.857q-8 0-13.143 5.143t-5.143 13.143v91.429q0 8 5.143 13.143t13.143 5.143h256q8 0 13.143-5.143t5.143-13.143zM512 274.286v-91.429q0-8-5.143-13.143t-13.143-5.143h-109.714q-8 0-13.143 5.143t-5.143 13.143v91.429q0 8 5.143 13.143t13.143 5.143h109.714q8 0 13.143-5.143t5.143-13.143zM877.714 512q0 119.429-58.857 220.286t-159.714 159.714-220.286 58.857-220.286-58.857-159.714-159.714-58.857-220.286 58.857-220.286 159.714-159.714 220.286-58.857 220.286 58.857 159.714 159.714 58.857 220.286z"></path></svg></a></div></footer><script src="/code/bundle.js" async></script></body></html>
